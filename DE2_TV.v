@@ -356,6 +356,7 @@ ITU_656_Decoder		u4	(	//	TV Decoder Input
 							//	Control Signals
 							.iSwap_CbCr(Quotient[0]),
 							.iSkip(Remain==4'h0),
+							.iStop(~DPDT_SW[2] && KEY[1]),
 							.iRST_N(DLY1),
 							.iCLK_27(TD_CLK)	);
 
@@ -438,9 +439,9 @@ YCbCr2RGB 			u8	(	//	Output Side
 
 //	VGA Controller
 VGA_Ctrl			u9	(	//	Host Side
-							.iRed(mRed),
-							.iGreen(mGreen),
-							.iBlue(mBlue),
+							.iRed(mRedOSD),
+							.iGreen(mGreenOSD),
+							.iBlue(mBlueOSD),
 							.oCurrent_X(VGA_X),
 							.oCurrent_Y(VGA_Y),
 							.oRequest(VGA_Read),
@@ -457,6 +458,10 @@ VGA_Ctrl			u9	(	//	Host Side
 							.iCLK(OSC_27),
 							.iRST_N(DLY2)	);
 
+assign mRedOSD = (((VGA_Y == 240)&&( VGA_X < 350 )&& (VGA_X > 290))  || ((VGA_X == 320) && (VGA_Y <270) && (VGA_Y > 210)))? 9'h000 : mRed;
+assign mGreenOSD = (((VGA_Y == 240)&&( VGA_X < 350 )&& (VGA_X > 290))|| ((VGA_X == 320) && (VGA_Y <270) && (VGA_Y > 210)))? 9'hfff : mGreen;
+assign mBlueOSD = (((VGA_Y == 240)&&( VGA_X < 350 )&& (VGA_X > 290)) || ((VGA_X == 320) && (VGA_Y <270) && (VGA_Y > 210)))? 9'h000 : mBlue;
+							
 //	For ITU-R 656 Decoder
 wire	[15:0]	YCbCr;
 wire	[9:0]	TV_X;
@@ -466,6 +471,12 @@ wire			TV_DVAL;
 wire	[9:0]	mRed;
 wire	[9:0]	mGreen;
 wire	[9:0]	mBlue;
+
+wire	[9:0]	mRedOSD;
+wire	[9:0]	mGreenOSD;
+wire	[9:0]	mBlueOSD;
+
+
 wire	[10:0]	VGA_X;
 wire	[10:0]	VGA_Y;
 wire			VGA_Read;	//	VGA data request

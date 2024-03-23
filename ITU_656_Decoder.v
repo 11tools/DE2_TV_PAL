@@ -10,11 +10,13 @@ module	ITU_656_Decoder(	//	TV Decoder Input
 							//	Control Signals
 							iSwap_CbCr,
 							iSkip,
+							iStop,
 							iRST_N,
 							iCLK_27	);
 input	[7:0]	iTD_DATA;
 input			iSwap_CbCr;
 input			iSkip;
+input       iStop;
 input			iRST_N;
 input			iCLK_27;
 output	[15:0]	oYCbCr;
@@ -115,7 +117,8 @@ begin
 			&& 	FVAL				//	Frame valid?
 			&& 	Active_Video		//	Active video?
 			&& 	Cont[0]				//	Complete ITU-R 601?
-			&& 	!iSkip	)			//	Is non-skip pixel?
+			&& 	!iSkip
+			&&    iStop)			//	Is non-skip pixel?
 		Data_Valid	<=	1'b1;
 		else
 		Data_Valid	<=	1'b0;
